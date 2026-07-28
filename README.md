@@ -32,35 +32,39 @@ Claude, Cursor, GitHub Copilot, OpenAI Codex, Gemini CLI, VS Code, OpenCode,
 Roo Code, and dozens more — can load it directly once it's placed (or
 symlinked) in the location that client scans for skills.
 
-### Fastest: npx, straight from the GitHub link
+### Recommended: `npx skills`, straight from the GitHub link
 
-No clone step needed — `npx` can run a package directly off a `github:`
-spec. This repo ships a tiny installer (`bin/cli.js`, no dependencies) that
-copies the skill files into place for you:
+No clone step needed. [`skills`](https://github.com/vercel-labs/skills) is a
+third-party, actively maintained CLI (by Vercel) that installs Agent Skills
+from a GitHub repo into any of 70+ supported agents' skills directories —
+including Claude Code. It fetches the repo itself (not via an `npm install
+git+...` dependency), so it isn't affected by npm's `allow-git` security
+default that blocks plain `npx github:owner/repo` on modern npm versions.
 
 ```bash
-# Personal Claude Code install (~/.claude/skills/data-to-okf/)
-npx github:rajivmehtaflex/data-to-okf install
+# Recommended: works with any of 70+ supported agents, incl. Claude Code
+npx skills add rajivmehtaflex/data-to-okf
 
-# This project only (<project-root>/.claude/skills/data-to-okf/)
-npx github:rajivmehtaflex/data-to-okf install --project
+# Install for Claude Code specifically, personal (all projects)
+npx skills add rajivmehtaflex/data-to-okf -g -a claude-code
 
-# Any other Agent-Skills-compatible client — point it at that client's
-# own skills directory (see the table below or agentskills.io/clients)
-npx github:rajivmehtaflex/data-to-okf install --target ./.cursor/skills/data-to-okf
+# Install for Claude Code, this project only (default scope)
+npx skills add rajivmehtaflex/data-to-okf -a claude-code
+
+# See what would be installed without installing anything
+npx skills add rajivmehtaflex/data-to-okf --list
 ```
 
-Run `npx github:rajivmehtaflex/data-to-okf --help` to see all options. The
-installer only copies `SKILL.md`, `scripts/`, `README.md`, and `LICENSE` —
-it never touches the git/npm packaging files, and it's safe to re-run any
-time to pick up an update (it just overwrites the copy in place).
+A full GitHub URL (`npx skills add https://github.com/rajivmehtaflex/data-to-okf`)
+works too. See [`skills`' own supported-agents table](https://github.com/vercel-labs/skills#supported-agents)
+for the `-a`/`--agent` value and install path for clients other than Claude
+Code (Cursor, Codex, OpenCode, and dozens more).
 
-### Manual: clone the repo
+### Fallback 1: clone the repo manually
 
-Works everywhere, including clients where a hardcoded target path above
-doesn't apply. The general pattern is the same everywhere: **clone this
-repo into your client's skills directory, keeping the folder name
-`data-to-okf`.**
+Works everywhere, with no extra CLI to trust. The general pattern is the
+same everywhere: **clone this repo into your client's skills directory,
+keeping the folder name `data-to-okf`.**
 
 ```bash
 git clone https://github.com/rajivmehtaflex/data-to-okf.git data-to-okf
@@ -80,6 +84,26 @@ Per-client install paths:
 
 A quick way to confirm it loaded: ask your agent to list its available
 skills (in Claude Code, run `/skills`) and look for `data-to-okf`.
+
+### Fallback 2: `npx github:...` with this repo's own installer
+
+This repo also bundles its own tiny installer (`bin/cli.js`, no
+dependencies) that works the same way `npx skills` does, without depending
+on a third-party package. It's gated behind an npm security setting on
+modern npm (v12+), `allow-git`, which defaults to blocking all
+`npx github:owner/repo` installs — opt in first (once per machine):
+
+```bash
+npm config set allow-git "github.com/rajivmehtaflex/*"
+
+npx github:rajivmehtaflex/data-to-okf install            # personal Claude Code
+npx github:rajivmehtaflex/data-to-okf install --project   # this project only
+npx github:rajivmehtaflex/data-to-okf install --target <path>   # any other client
+```
+
+Without that one-time `npm config set`, you'll see `npm error code
+EALLOWGIT`. Run `npx github:rajivmehtaflex/data-to-okf --help` to see all
+options.
 
 ### One-time setup after installing
 
