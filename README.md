@@ -30,9 +30,37 @@ This repo follows the [Agent Skills specification](https://agentskills.io/specif
 so any [compatible client](https://agentskills.io/clients) — Claude Code,
 Claude, Cursor, GitHub Copilot, OpenAI Codex, Gemini CLI, VS Code, OpenCode,
 Roo Code, and dozens more — can load it directly once it's placed (or
-symlinked) in the location that client scans for skills. The general
-pattern is the same everywhere: **clone this repo into your client's skills
-directory, keeping the folder name `data-to-okf`.**
+symlinked) in the location that client scans for skills.
+
+### Fastest: npx, straight from the GitHub link
+
+No clone step needed — `npx` can run a package directly off a `github:`
+spec. This repo ships a tiny installer (`bin/cli.js`, no dependencies) that
+copies the skill files into place for you:
+
+```bash
+# Personal Claude Code install (~/.claude/skills/data-to-okf/)
+npx github:rajivmehtaflex/data-to-okf install
+
+# This project only (<project-root>/.claude/skills/data-to-okf/)
+npx github:rajivmehtaflex/data-to-okf install --project
+
+# Any other Agent-Skills-compatible client — point it at that client's
+# own skills directory (see the table below or agentskills.io/clients)
+npx github:rajivmehtaflex/data-to-okf install --target ./.cursor/skills/data-to-okf
+```
+
+Run `npx github:rajivmehtaflex/data-to-okf --help` to see all options. The
+installer only copies `SKILL.md`, `scripts/`, `README.md`, and `LICENSE` —
+it never touches the git/npm packaging files, and it's safe to re-run any
+time to pick up an update (it just overwrites the copy in place).
+
+### Manual: clone the repo
+
+Works everywhere, including clients where a hardcoded target path above
+doesn't apply. The general pattern is the same everywhere: **clone this
+repo into your client's skills directory, keeping the folder name
+`data-to-okf`.**
 
 ```bash
 git clone https://github.com/rajivmehtaflex/data-to-okf.git data-to-okf
